@@ -1,9 +1,6 @@
 /**
  * Álgebra lineal mínima para el núcleo de ArmLab.
- *
  * Portado del bloque ==MATH-START== / ==MATH-END== del prototipo
- * "Simulador de Brazo Robótico.html". Las matrices son arreglos de filas:
- * M[fila][columna].
  */
 import type { Vec3, Mat4, Matrix } from './types';
 
@@ -23,7 +20,7 @@ export function matMul(A: Matrix, B: Matrix): Matrix {
   for (let i = 0; i < m; i++) {
     for (let p = 0; p < k; p++) {
       const a = A[i][p];
-      if (a === 0) continue; // atajo: un cero no aporta nada a la suma
+      if (a === 0) continue; 
       for (let j = 0; j < n; j++) C[i][j] += a * B[p][j];
     }
   }
