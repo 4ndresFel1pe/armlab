@@ -9,8 +9,8 @@ manipulabilidad de Yoshikawa — todo calculado en el navegador.
 
 🚧 En construcción.
 
-- ✅ **Fase 0 — El motor:** núcleo matemático en TypeScript con pruebas.
-- ⏳ **Fase 1 — Ver:** galería de ejemplos, visor 3D y deslizadores por articulación.
+-  **Fase 0 — El motor:** núcleo matemático en TypeScript con pruebas.
+-  **Fase 1 — Ver:** galería de ejemplos, visor 3D y deslizadores por articulación.
 
 ## Desarrollo
 
