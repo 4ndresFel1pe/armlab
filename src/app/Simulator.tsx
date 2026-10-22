@@ -12,6 +12,8 @@ interface Props {
   design: Design;
   /** Pestaña con la que abre el simulador. */
   initialTab?: SimTab;
+  /** Cambia al abrir un diseño: la cámara se encuadra de nuevo. */
+  frameKey: number;
   actions: EditActions;
   onJointChange: (index: number, valueSI: number) => void;
   onBack: () => void;
@@ -20,6 +22,7 @@ interface Props {
 export function Simulator({
   design,
   initialTab = 'move',
+  frameKey,
   actions,
   onJointChange,
   onBack,
@@ -71,7 +74,7 @@ export function Simulator({
           </div>
         </aside>
 
-        <Viewport3D robot={robot} q={pose} />
+        <Viewport3D robot={robot} q={pose} frameKey={frameKey} />
 
         <aside className="panel">
           <div className="panel-body">

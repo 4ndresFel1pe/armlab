@@ -21,10 +21,13 @@ export default function App() {
   const [view, setView] = useState<View>('gallery');
   // Robot y pose en un solo estado: cambian juntos o no cambian.
   const [design, setDesign] = useState<Design>(() => designFromRobot(PRESETS.servo4));
+  /** Sube cada vez que se abre un diseño: le dice al visor que encuadre. */
+  const [frameKey, setFrameKey] = useState(0);
 
   /** Abre un robot: carga su pose inicial y cambia de pantalla. */
   function openRobot(robot: Robot) {
     setDesign(designFromRobot(robot));
+    setFrameKey(k => k + 1);
     setView('sim');
   }
 
@@ -53,6 +56,7 @@ export default function App() {
   return (
     <Simulator
       design={design}
+      frameKey={frameKey}
       actions={actions}
       onJointChange={updatePose}
       onBack={() => setView('gallery')}

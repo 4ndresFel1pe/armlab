@@ -17,6 +17,11 @@ interface Scene {
 interface Props {
   robot: Robot;
   q: number[];
+  /**
+   * Cambia cada vez que se abre un diseño (ejemplo, archivo o uno nuevo).
+   * La cámara se encuadra solo cuando cambia este número.
+   */
+  frameKey?: number;
 }
 
 /** Dirección desde la que mira la cámara: vista isométrica, como el prototipo. */
@@ -38,9 +43,11 @@ function frameRobot(s: Scene, robot: Robot): void {
   s.grid.scale.setScalar(reach > 0.9 ? 2 : 1);
 }
 
-export function Viewport3D({ robot, q }: Props) {
+export function Viewport3D({ robot, q, frameKey = 0 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene | null>(null);
+  /** El frameKey con el que se encuadró la escena actual. */
+  const framedRef = useRef<number | null>(null);
 
   // --- Efecto 1: montar la escena. Corre una sola vez. ---
   useEffect(() => {
@@ -107,6 +114,7 @@ export function Viewport3D({ robot, q }: Props) {
       renderer.forceContextLoss();       // suelta el contexto WebGL ya, sin esperar al navegador
       renderer.domElement.remove();
       sceneRef.current = null;
+      framedRef.current = null;          // la próxima escena se encuadra de nuevo
     };
   }, []);
 
@@ -118,13 +126,16 @@ export function Viewport3D({ robot, q }: Props) {
     buildRobotMesh(s.robotGroup, robot, q);
   }, [robot, q]);
 
-  // --- Efecto 3: encuadrar la cámara solo cuando cambia el robot ---
-  // No depende de q: mover un deslizador no debe mover la cámara.
+  // --- Efecto 3: encuadrar la cámara solo al abrir un diseño ---
+  // Mover un deslizador no debe mover la cámara, y editar un parámetro
+  // tampoco: con el editor, el robot cambia en cada tecla, y la cámara
+  // saltaría mientras el usuario la está usando. Por eso se compara frameKey.
   useEffect(() => {
     const s = sceneRef.current;
-    if (!s) return;
+    if (!s || framedRef.current === frameKey) return;
+    framedRef.current = frameKey;
     frameRobot(s, robot);
-  }, [robot]);
+  }, [robot, frameKey]);
 
   return <div ref={mountRef} className="viewport" />;
 }
