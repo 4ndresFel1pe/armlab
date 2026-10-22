@@ -1,17 +1,12 @@
 import { useState } from 'react';
 import type { Robot } from '../core/types';
 import type { Design } from '../core/format';
-import { jointValue } from '../core/dh';
+import { designFromRobot, setJointValue } from '../core/edit';
 import { PRESETS } from '../core/presets';
 import { Gallery } from './Gallery';
 import { Simulator } from './Simulator';
 
 type View = 'gallery' | 'sim';
-
-/** El diseño que se obtiene al abrir un robot: su estructura y su pose inicial. */
-function designFromRobot(robot: Robot): Design {
-  return { robot, pose: robot.joints.map(jointValue) };
-}
 
 export default function App() {
   const [view, setView] = useState<View>('gallery');
@@ -24,12 +19,9 @@ export default function App() {
     setView('sim');
   }
 
-  /** Mueve una sola articulación, creando un arreglo nuevo. */
+  /** Mueve una sola articulación (deslizador). */
   function updatePose(index: number, valueSI: number) {
-    setDesign(prev => ({
-      ...prev,
-      pose: prev.pose.map((v, i) => (i === index ? valueSI : v)),
-    }));
+    setDesign(prev => setJointValue(prev, index, valueSI));
   }
 
   if (view === 'gallery') {
