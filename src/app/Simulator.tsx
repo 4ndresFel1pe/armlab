@@ -5,6 +5,7 @@ import { JointSliders } from '../ui/JointSliders';
 import { RobotEditor } from '../ui/RobotEditor';
 import type { EditActions } from '../ui/RobotEditor';
 import { ResultsPanel } from '../ui/ResultsPanel';
+import { OpenFileButton } from '../ui/OpenFileButton';
 
 export type SimTab = 'move' | 'edit';
 
@@ -17,6 +18,7 @@ interface Props {
   actions: EditActions;
   onJointChange: (index: number, valueSI: number) => void;
   onDownload: () => void;
+  onOpenFile: (file: File) => void;
   onBack: () => void;
 }
 
@@ -27,16 +29,18 @@ export function Simulator({
   actions,
   onJointChange,
   onDownload,
+  onOpenFile,
   onBack,
 }: Props) {
   const { robot, pose } = design;
   const [tab, setTab] = useState<SimTab>(initialTab);
 
   return (
-    <div className="app">
+    <div className="sim">
       <header className="topbar">
         <h1>{robot.name}</h1>
         <div className="topbar-actions">
+          <OpenFileButton onFile={onOpenFile} />
           <button className="btn" onClick={onDownload}>Descargar</button>
           <button className="btn" onClick={onBack}>← Galería</button>
         </div>

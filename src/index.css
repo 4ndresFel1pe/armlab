@@ -28,6 +28,7 @@ button, input, select { font: inherit; color: inherit; }
 
 /* --- Estructura --- */
 .app { height: 100%; display: flex; flex-direction: column; }
+.sim { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
@@ -127,7 +128,7 @@ table.data tr.is-P { --accent: var(--pris); }
 table.data td.is-var { color: var(--accent); font-weight: 700; }
 
 /* --- Galería --- */
-.gallery { padding: 24px; overflow: auto; }
+.gallery { flex: 1; min-height: 0; padding: 24px; overflow: auto; }
 .gallery-grid {
   display: grid; gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -147,6 +148,28 @@ table.data td.is-var { color: var(--accent); font-weight: 700; }
 }
 .btn:hover:not(:disabled) { border-color: var(--muted); }
 .btn:disabled { opacity: .55; cursor: default; }
+
+/* --- Mensajes --- */
+.error {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 8px 12px; margin: 10px 16px 0;
+  border: 1px solid #bf3328; border-radius: 5px; font-size: 13px;
+  background: #fbeeed;
+}
+.error button { border: 0; background: none; cursor: pointer;
+                font-size: 16px; color: var(--muted); }
+
+/* --- Arrastrar un archivo --- */
+/* pointer-events: none — el aviso no debe "atrapar" el arrastre. */
+.drop-overlay {
+  position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+  background: rgb(26 32 39 / .35); pointer-events: none;
+}
+.drop-overlay p {
+  margin: 0; padding: 18px 26px; border-radius: 8px;
+  background: var(--panel); border: 2px dashed var(--accent);
+  font-size: 16px; font-weight: 600;
+}
 
 @media (max-width: 1100px) {
   .app { height: auto; min-height: 100%; }   /* en pantallas angostas la página crece y se desplaza entera */
