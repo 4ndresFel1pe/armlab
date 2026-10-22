@@ -1,16 +1,17 @@
-import type { Robot } from '../core/types';
+import type { Design } from '../core/format';
 import { Viewport3D } from '../viewer/Viewport3D';
 import { JointSliders } from '../ui/JointSliders';
 import { ResultsPanel } from '../ui/ResultsPanel';
 
 interface Props {
-  robot: Robot;
-  q: number[];
+  design: Design;
   onJointChange: (index: number, valueSI: number) => void;
   onBack: () => void;
 }
 
-export function Simulator({ robot, q, onJointChange, onBack }: Props) {
+export function Simulator({ design, onJointChange, onBack }: Props) {
+  const { robot, pose } = design;
+
   return (
     <div className="app">
       <header className="topbar">
@@ -24,17 +25,17 @@ export function Simulator({ robot, q, onJointChange, onBack }: Props) {
             <h2>Articulaciones</h2>
             <JointSliders
               joints={robot.joints}
-              q={q}
+              q={pose}
               onChange={onJointChange}
             />
           </div>
         </aside>
 
-        <Viewport3D robot={robot} q={q} />
+        <Viewport3D robot={robot} q={pose} />
 
         <aside className="panel">
           <div className="panel-body">
-            <ResultsPanel robot={robot} q={q} />
+            <ResultsPanel robot={robot} q={pose} />
           </div>
         </aside>
       </div>

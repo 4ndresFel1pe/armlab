@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Robot } from '../core/types';
+import type { Design } from '../core/format';
 import { jointValue } from '../core/dh';
 import { PRESETS } from '../core/presets';
 import { Gallery } from './Gallery';
@@ -7,21 +8,28 @@ import { Simulator } from './Simulator';
 
 type View = 'gallery' | 'sim';
 
+/** El diseño que se obtiene al abrir un robot: su estructura y su pose inicial. */
+function designFromRobot(robot: Robot): Design {
+  return { robot, pose: robot.joints.map(jointValue) };
+}
+
 export default function App() {
   const [view, setView] = useState<View>('gallery');
-  const [robot, setRobot] = useState<Robot>(PRESETS.servo4);
-  const [q, setQ] = useState<number[]>(PRESETS.servo4.joints.map(jointValue));
+  // Robot y pose en un solo estado: cambian juntos o no cambian.
+  const [design, setDesign] = useState<Design>(() => designFromRobot(PRESETS.servo4));
 
   /** Abre un robot: carga su pose inicial y cambia de pantalla. */
-  function openRobot(r: Robot) {
-    setRobot(r);
-    setQ(r.joints.map(jointValue));
+  function openRobot(robot: Robot) {
+    setDesign(designFromRobot(robot));
     setView('sim');
   }
 
-  /** Cambia una sola articulación, creando un arreglo nuevo. */
-  function updateJoint(index: number, valueSI: number) {
-    setQ(prev => prev.map((v, i) => (i === index ? valueSI : v)));
+  /** Mueve una sola articulación, creando un arreglo nuevo. */
+  function updatePose(index: number, valueSI: number) {
+    setDesign(prev => ({
+      ...prev,
+      pose: prev.pose.map((v, i) => (i === index ? valueSI : v)),
+    }));
   }
 
   if (view === 'gallery') {
@@ -30,9 +38,8 @@ export default function App() {
 
   return (
     <Simulator
-      robot={robot}
-      q={q}
-      onJointChange={updateJoint}
+      design={design}
+      onJointChange={updatePose}
       onBack={() => setView('gallery')}
     />
   );
