@@ -9,8 +9,8 @@ type View = 'gallery' | 'sim';
 
 export default function App() {
   const [view, setView] = useState<View>('gallery');
-  const [robot, setRobot] = useState<Robot>(PRESETS[0]);
-  const [q, setQ] = useState<number[]>(PRESETS[0].joints.map(jointValue));
+  const [robot, setRobot] = useState<Robot>(PRESETS.servo4);
+  const [q, setQ] = useState<number[]>(PRESETS.servo4.joints.map(jointValue));
 
   /** Abre un robot: carga su pose inicial y cambia de pantalla. */
   function openRobot(r: Robot) {
