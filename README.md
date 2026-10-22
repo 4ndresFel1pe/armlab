@@ -11,6 +11,7 @@ manipulabilidad de Yoshikawa — todo calculado en el navegador.
 
 -  **Fase 0 — El motor:** núcleo matemático en TypeScript con pruebas.
 -  **Fase 1 — Ver:** galería de ejemplos, visor 3D y deslizadores por articulación, PRUEBA: https://armlab.vercel.app/
+-  **Fase 2 — Crear:** editor de articulaciones (tipo, parámetros DH y límites), descarga del diseño como `.armlab.json` y carga arrastrándolo sobre la página.
 
 ## Desarrollo
 
@@ -44,11 +45,14 @@ muestra centímetros y grados; la conversión ocurre solo en la frontera entre
 | `jacobian.ts` | Jacobiano geométrico 6 × n y Jacobianos de tarea |
 | `manipulability.ts` | Valores singulares y manipulabilidad de Yoshikawa |
 | `presets.ts` | Nueve robots de ejemplo (planar, SCARA, Stanford, PUMA…) |
+| `format.ts` | Formato del archivo `.armlab.json`: versión, validación y migración |
+| `edit.ts` | Operaciones de edición del diseño (funciones puras) |
 
 ## Documentación
 
 - [`docs/armlab-especificaciones.md`](docs/armlab-especificaciones.md) — alcance, decisiones y fases.
 - [`docs/armlab-fase-0.md`](docs/armlab-fase-0.md) — plan de la Fase 0.
+- [`docs/armlab-fase-2.md`](docs/armlab-fase-2.md) — plan de la Fase 2 y notas de implementación.
 
 ## Referencias
 
