@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Robot } from '../core/types';
 import type { Design } from '../core/format';
+import { serialize } from '../core/format';
 import {
   addJoint,
   changeJointType,
@@ -11,6 +12,7 @@ import {
   setJointValue,
 } from '../core/edit';
 import { PRESETS } from '../core/presets';
+import { downloadText, slug } from '../ui/download';
 import type { EditActions } from '../ui/RobotEditor';
 import { Gallery } from './Gallery';
 import { Simulator } from './Simulator';
@@ -41,6 +43,11 @@ export default function App() {
     setDesign(op);
   }
 
+  /** Descarga el diseño como "nombre-del-brazo.armlab.json". */
+  function download() {
+    downloadText(`${slug(design.robot.name)}.armlab.json`, serialize(design));
+  }
+
   const actions: EditActions = {
     patchJoint: (i, patch) => edit(d => patchJoint(d, i, patch)),
     changeType: (i, type) => edit(d => changeJointType(d, i, type)),
@@ -59,6 +66,7 @@ export default function App() {
       frameKey={frameKey}
       actions={actions}
       onJointChange={updatePose}
+      onDownload={download}
       onBack={() => setView('gallery')}
     />
   );

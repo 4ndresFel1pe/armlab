@@ -16,6 +16,7 @@ interface Props {
   frameKey: number;
   actions: EditActions;
   onJointChange: (index: number, valueSI: number) => void;
+  onDownload: () => void;
   onBack: () => void;
 }
 
@@ -25,6 +26,7 @@ export function Simulator({
   frameKey,
   actions,
   onJointChange,
+  onDownload,
   onBack,
 }: Props) {
   const { robot, pose } = design;
@@ -34,7 +36,10 @@ export function Simulator({
     <div className="app">
       <header className="topbar">
         <h1>{robot.name}</h1>
-        <button className="btn" onClick={onBack}>← Galería</button>
+        <div className="topbar-actions">
+          <button className="btn" onClick={onDownload}>Descargar</button>
+          <button className="btn" onClick={onBack}>← Galería</button>
+        </div>
       </header>
 
       <div className="layout">
