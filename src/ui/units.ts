@@ -28,3 +28,22 @@ export function fmt(x: number, decimals = 2): string {
   const clean = Number(s) === 0 ? s.replace('-', '') : s;
   return clean.replace('.', ',').replace('-', '−');
 }
+
+/**
+ * Lee un número escrito por el usuario. Acepta coma o punto decimal y el signo
+ * menos tipográfico (−). Devuelve null si el texto no es un número completo:
+ * "", "-", "1,2,3", "abc".
+ */
+export function parseDecimal(text: string): number | null {
+  const t = text.trim().replace(',', '.').replace('−', '-');
+  if (!/^[-+]?(\d+\.?\d*|\.\d+)$/.test(t)) return null;
+  return Number(t);
+}
+
+/**
+ * Cómo se muestra un número dentro de un campo editable: con coma decimal y
+ * sin el ruido de la coma flotante (7,000000000000001 → "7").
+ */
+export function editableNumber(x: number, decimals = 3): string {
+  return String(Number(x.toFixed(decimals))).replace('.', ',');
+}
