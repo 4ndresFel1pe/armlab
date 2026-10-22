@@ -80,6 +80,11 @@ table.data th:first-child, table.data td:first-child { text-align: left; }
 .vec span { display: flex; justify-content: space-between; }
 .vec em { font-style: normal; color: var(--muted); }
 
+/* --- Panel de resultados --- */
+.result + .result { margin-top: 20px; }
+table.data tr.is-P { --accent: var(--pris); }
+table.data td.is-var { color: var(--accent); font-weight: 700; }
+
 /* --- Galería --- */
 .gallery { padding: 24px; overflow: auto; }
 .gallery-grid {

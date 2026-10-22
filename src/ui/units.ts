@@ -23,5 +23,8 @@ export function toSI(joint: Joint, shown: number): number {
 /** Número con decimales fijos, con coma decimal (convención en español). */
 export function fmt(x: number, decimals = 2): string {
   if (!Number.isFinite(x)) return '—';
-  return x.toFixed(decimals).replace('.', ',').replace('-', '−');
+  const s = x.toFixed(decimals);
+  // Un −0,0001 redondeado da "-0.00": se le quita el signo.
+  const clean = Number(s) === 0 ? s.replace('-', '') : s;
+  return clean.replace('.', ',').replace('-', '−');
 }
