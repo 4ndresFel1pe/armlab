@@ -133,3 +133,23 @@ export function removeJoint(design: Design, index: number): Design {
 export function renameRobot(design: Design, name: string): Design {
   return { ...design, robot: { ...design.robot, name } };
 }
+
+/**
+ * Brazo mínimo para "Empezar desde cero". Dos articulaciones de revoluta, no
+ * una: con una sola el usuario no ve que es un brazo. Dos ya forman una cadena
+ * reconocible y tienen algo que mover.
+ */
+export function newDesign(): Design {
+  return {
+    robot: {
+      name: 'Mi brazo',
+      joints: [
+        { type: 'R', theta: 0, d: 0.05, a: 0.1, alpha: 0,
+          qMin: -Math.PI, qMax: Math.PI },
+        { type: 'R', theta: 0, d: 0,    a: 0.1, alpha: 0,
+          qMin: -Math.PI, qMax: Math.PI },
+      ],
+    },
+    pose: [0, 0],
+  };
+}

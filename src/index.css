@@ -142,9 +142,14 @@ table.data td.is-var { color: var(--accent); font-weight: 700; }
 .card:hover { border-color: var(--accent); }
 .card h3 { margin: 0 0 4px; font-size: 15px; }
 .card p { margin: 0; color: var(--muted); font-size: 12.5px; }
+.card-new { border-style: dashed; border-color: var(--accent);
+            background: transparent; }
+.card-new h3 { color: var(--accent); }
+.gallery-actions { display: flex; flex-wrap: wrap; gap: 8px;
+                   align-items: center; }
 
 .resume {
-  margin-top: 4px; padding: 6px 12px; cursor: pointer;
+  padding: 6px 12px; cursor: pointer;
   border: 1px solid var(--accent); border-radius: 5px;
   background: var(--panel); color: var(--accent); font-weight: 600;
 }

@@ -6,6 +6,7 @@ import {
   addJoint,
   changeJointType,
   designFromRobot,
+  newDesign,
   patchJoint,
   removeJoint,
   renameRobot,
@@ -17,6 +18,7 @@ import { useFileDrop } from '../ui/useFileDrop';
 import type { EditActions } from '../ui/RobotEditor';
 import { Gallery } from './Gallery';
 import { Simulator } from './Simulator';
+import type { SimTab } from './Simulator';
 
 type View = 'gallery' | 'sim';
 
@@ -33,13 +35,15 @@ export default function App() {
   /** ¿Hubo ediciones desde la última vez que se descargó o se abrió? */
   const [dirty, setDirty] = useState(false);
   const [noticeOpen, setNoticeOpen] = useState(true);
+  /** Pestaña con la que abre el simulador: "Editar" si se empieza de cero. */
+  const [startTab, setStartTab] = useState<SimTab>('move');
 
   /**
    * Abre un diseño (ejemplo o archivo) y pasa al simulador. Si el actual tiene
    * cambios sin descargar, pregunta antes: esta página no guarda nada.
    */
   const openDesign = useCallback(
-    (next: Design) => {
+    (next: Design, tab: SimTab = 'move') => {
       if (
         dirty &&
         !window.confirm(
@@ -50,6 +54,7 @@ export default function App() {
         return;
       }
       setDesign(next);
+      setStartTab(tab);
       setFrameKey(k => k + 1);
       setDirty(false);
       setError(null);
@@ -151,6 +156,9 @@ export default function App() {
       {view === 'gallery' ? (
         <Gallery
           onSelect={(robot: Robot) => openDesign(designFromRobot(robot))}
+          // Un brazo nuevo abre directo en "Editar": es lo que se viene a hacer.
+          onNew={() => openDesign(newDesign(), 'edit')}
+          onOpenFile={handleFile}
           // Si ya se abrió algo, la galería ofrece volver a ese diseño.
           current={frameKey > 0 ? { name: design.robot.name, dirty } : undefined}
           onResume={() => setView('sim')}
@@ -158,6 +166,7 @@ export default function App() {
       ) : (
         <Simulator
           design={design}
+          initialTab={startTab}
           frameKey={frameKey}
           dirty={dirty}
           actions={actions}

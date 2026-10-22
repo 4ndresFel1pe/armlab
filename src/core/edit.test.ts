@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   MAX_JOINTS,
   addJoint,
+  newDesign,
   changeJointType,
   designFromRobot,
   patchJoint,
@@ -142,6 +143,15 @@ describe('addJoint / removeJoint', () => {
     for (let i = 0; i < 5; i++) d = removeJoint(d, 0);
     expect(d.robot.joints).toHaveLength(1);
     expectConsistent(d);
+  });
+});
+
+describe('newDesign', () => {
+  it('dos articulaciones, consistente y siempre un objeto nuevo', () => {
+    const d = newDesign();
+    expect(d.robot.joints).toHaveLength(2);
+    expectConsistent(d);
+    expect(newDesign()).not.toBe(d);
   });
 });
 
