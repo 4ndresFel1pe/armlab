@@ -58,12 +58,11 @@ function sphereAt(
 }
 
 /**
- * Unidad visual u: 1/45 del alcance del robot, igual que en el prototipo.
- * El alcance suma |a| y |d| de todas las articulaciones; en una prismática se
- * usa su extensión máxima. Todos los grosores se expresan en múltiplos de u,
- * así un brazo chico y uno grande se ven igual de proporcionados.
+ * Alcance aproximado del robot, en metros: suma |a| y |d| de todas las
+ * articulaciones; en una prismática usa su extensión máxima.
+ * Lo usan el grosor de las piezas (aquí) y el encuadre de la cámara (Viewport3D).
  */
-function visualUnit(robot: Robot): number {
+export function robotReach(robot: Robot): number {
   let reach = 0;
   for (const j of robot.joints) {
     const dMax = j.type === 'P'
@@ -71,7 +70,16 @@ function visualUnit(robot: Robot): number {
       : Math.abs(j.d);
     reach += Math.abs(j.a) + dMax;
   }
-  return clamp(Math.max(reach, 0.05) / 45, 0.003, 0.04);
+  return Math.max(reach, 0.05);
+}
+
+/**
+ * Unidad visual u: 1/45 del alcance, igual que en el prototipo. Todos los
+ * grosores se expresan en múltiplos de u, así un brazo chico y uno grande se
+ * ven igual de proporcionados.
+ */
+function visualUnit(robot: Robot): number {
+  return clamp(robotReach(robot) / 45, 0.003, 0.04);
 }
 
 /** Vacía un grupo y libera la memoria de sus geometrías y materiales. */

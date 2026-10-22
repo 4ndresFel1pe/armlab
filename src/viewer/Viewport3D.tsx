@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { Robot } from '../core/types';
-import { buildRobotMesh, disposeGroup } from './robotMesh';
+import { buildRobotMesh, disposeGroup, robotReach } from './robotMesh';
 
 /** Objetos de three.js que deben sobrevivir entre repintados de React. */
 interface Scene {
@@ -11,11 +11,31 @@ interface Scene {
   camera: THREE.PerspectiveCamera;
   controls: OrbitControls;
   robotGroup: THREE.Group;
+  grid: THREE.GridHelper;
 }
 
 interface Props {
   robot: Robot;
   q: number[];
+}
+
+/** Dirección desde la que mira la cámara: vista isométrica, como el prototipo. */
+const ISO_DIR = new THREE.Vector3(1, -1.25, 0.85).normalize();
+
+/** Coloca la cámara y la rejilla de acuerdo con el tamaño del robot. */
+function frameRobot(s: Scene, robot: Robot): void {
+  const reach = robotReach(robot);
+  const target = new THREE.Vector3(0, 0, reach * 0.2);   // un poco arriba de la base
+  const distance = reach * 1.85 + 0.12;                   // más lejos si el robot es grande
+  const fit = Math.min(s.camera.aspect, 1);              // visor más alto que ancho (celular): alejarse más
+
+  s.camera.position.copy(target).addScaledVector(ISO_DIR, distance / fit);
+  s.controls.target.copy(target);
+  s.controls.update();
+
+  // La rejilla mide 1 m con 20 divisiones (celdas de 5 cm). Para robots
+  // grandes se duplica: 2 m con celdas de 10 cm.
+  s.grid.scale.setScalar(reach > 0.9 ? 2 : 1);
 }
 
 export function Viewport3D({ robot, q }: Props) {
@@ -75,7 +95,7 @@ export function Viewport3D({ robot, q }: Props) {
     };
     loop();
 
-    sceneRef.current = { renderer, scene, camera, controls, robotGroup };
+    sceneRef.current = { renderer, scene, camera, controls, robotGroup, grid };
 
     // --- Limpieza: se ejecuta al desmontar el componente ---
     return () => {
@@ -84,6 +104,7 @@ export function Viewport3D({ robot, q }: Props) {
       disposeGroup(robotGroup);
       controls.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();       // suelta el contexto WebGL ya, sin esperar al navegador
       renderer.domElement.remove();
       sceneRef.current = null;
     };
@@ -96,6 +117,14 @@ export function Viewport3D({ robot, q }: Props) {
     disposeGroup(s.robotGroup);
     buildRobotMesh(s.robotGroup, robot, q);
   }, [robot, q]);
+
+  // --- Efecto 3: encuadrar la cámara solo cuando cambia el robot ---
+  // No depende de q: mover un deslizador no debe mover la cámara.
+  useEffect(() => {
+    const s = sceneRef.current;
+    if (!s) return;
+    frameRobot(s, robot);
+  }, [robot]);
 
   return <div ref={mountRef} className="viewport" />;
 }
