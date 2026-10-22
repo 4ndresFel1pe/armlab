@@ -15,6 +15,8 @@ interface Props {
   initialTab?: SimTab;
   /** Cambia al abrir un diseño: la cámara se encuadra de nuevo. */
   frameKey: number;
+  /** Hay cambios sin descargar. */
+  dirty: boolean;
   actions: EditActions;
   onJointChange: (index: number, valueSI: number) => void;
   onDownload: () => void;
@@ -26,6 +28,7 @@ export function Simulator({
   design,
   initialTab = 'move',
   frameKey,
+  dirty,
   actions,
   onJointChange,
   onDownload,
@@ -40,6 +43,7 @@ export function Simulator({
       <header className="topbar">
         <h1>{robot.name}</h1>
         <div className="topbar-actions">
+          {dirty && <span className="dirty-mark">Cambios sin descargar</span>}
           <OpenFileButton onFile={onOpenFile} />
           <button className="btn" onClick={onDownload}>Descargar</button>
           <button className="btn" onClick={onBack}>← Galería</button>

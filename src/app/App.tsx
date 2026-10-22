@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Robot } from '../core/types';
 import type { Design } from '../core/format';
 import { parse, serialize } from '../core/format';
@@ -30,14 +30,33 @@ export default function App() {
   /** Sube cada vez que se abre un diseño: le dice al visor que encuadre. */
   const [frameKey, setFrameKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  /** ¿Hubo ediciones desde la última vez que se descargó o se abrió? */
+  const [dirty, setDirty] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(true);
 
-  /** Abre un diseño (ejemplo o archivo) y pasa al simulador. */
-  const openDesign = useCallback((next: Design) => {
-    setDesign(next);
-    setFrameKey(k => k + 1);
-    setError(null);
-    setView('sim');
-  }, []);
+  /**
+   * Abre un diseño (ejemplo o archivo) y pasa al simulador. Si el actual tiene
+   * cambios sin descargar, pregunta antes: esta página no guarda nada.
+   */
+  const openDesign = useCallback(
+    (next: Design) => {
+      if (
+        dirty &&
+        !window.confirm(
+          'El diseño actual tiene cambios sin descargar y se van a perder. ' +
+            '¿Abrir el otro de todas formas?',
+        )
+      ) {
+        return;
+      }
+      setDesign(next);
+      setFrameKey(k => k + 1);
+      setDirty(false);
+      setError(null);
+      setView('sim');
+    },
+    [dirty],
+  );
 
   /**
    * Lee un archivo arrastrado o escogido con "Abrir". Todo lo que venga de
@@ -69,19 +88,33 @@ export default function App() {
 
   const dragging = useFileDrop(handleFile);
 
+  // Si hay cambios sin descargar, el navegador pregunta antes de cerrar la
+  // pestaña. Muestra su propio mensaje: no se puede personalizar.
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [dirty]);
+
   /** Mueve una sola articulación (deslizador). */
   function updatePose(index: number, valueSI: number) {
     setDesign(prev => setJointValue(prev, index, valueSI));
   }
 
-  /** Aplica una operación de edición (de core/edit.ts) sobre el diseño actual. */
+  /**
+   * Aplica una operación de edición (de core/edit.ts) sobre el diseño actual.
+   * Mover un deslizador no cuenta como edición: solo cambiar la estructura.
+   */
   function edit(op: (prev: Design) => Design) {
     setDesign(op);
+    setDirty(true);
   }
 
   /** Descarga el diseño como "nombre-del-brazo.armlab.json". */
   function download() {
     downloadText(`${slug(design.robot.name)}.armlab.json`, serialize(design));
+    setDirty(false);
   }
 
   const actions: EditActions = {
@@ -94,6 +127,18 @@ export default function App() {
 
   return (
     <div className="app">
+      {noticeOpen && (
+        <div className="notice">
+          <span>
+            Esta página no guarda sus diseños. Descargue el archivo para
+            conservarlo.
+          </span>
+          <button onClick={() => setNoticeOpen(false)} aria-label="Cerrar aviso">
+            ×
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className="error" role="alert">
           <span>{error}</span>
@@ -104,11 +149,17 @@ export default function App() {
       )}
 
       {view === 'gallery' ? (
-        <Gallery onSelect={(robot: Robot) => openDesign(designFromRobot(robot))} />
+        <Gallery
+          onSelect={(robot: Robot) => openDesign(designFromRobot(robot))}
+          // Si ya se abrió algo, la galería ofrece volver a ese diseño.
+          current={frameKey > 0 ? { name: design.robot.name, dirty } : undefined}
+          onResume={() => setView('sim')}
+        />
       ) : (
         <Simulator
           design={design}
           frameKey={frameKey}
+          dirty={dirty}
           actions={actions}
           onJointChange={updatePose}
           onDownload={download}

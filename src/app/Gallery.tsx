@@ -3,18 +3,28 @@ import { PRESETS } from '../core/presets';
 
 interface Props {
   onSelect: (robot: Robot) => void;
+  /** El diseño abierto, si lo hay: la galería ofrece volver a él. */
+  current?: { name: string; dirty: boolean };
+  onResume: () => void;
 }
 
 /** Los robots de ejemplo como arreglo, en el orden en que están escritos. */
 const ROBOTS = Object.values(PRESETS);
 
-export function Gallery({ onSelect }: Props) {
+export function Gallery({ onSelect, current, onResume }: Props) {
   return (
     <div className="gallery">
       <h1>ArmLab</h1>
       <p>
         Simulador de brazos robóticos seriales. Escoja uno para empezar.
       </p>
+
+      {current && (
+        <button className="resume" onClick={onResume}>
+          Volver a «{current.name || 'Brazo sin nombre'}»
+          {current.dirty && <span> · cambios sin descargar</span>}
+        </button>
+      )}
 
       <div className="gallery-grid">
         {ROBOTS.map(robot => {
